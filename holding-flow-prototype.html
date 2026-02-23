@@ -720,15 +720,14 @@
     <div class="field-question">What's your business about? Add details about the goods and services you offer and your main source of revenue</div>
     <div class="field"><textarea class="field-textarea" placeholder="Add a description">Unternehmensberatung und Halten von Beteiligungen an operativen Gesellschaften</textarea></div>
 
-    <div class="field-question">What type of business is this?</div>
+    <div class="field-question">Is your company a holding company?</div>
     <div class="field">
       <select class="field-select" id="entityTypeSelect" onchange="handleEntityType(this.value)">
         <option value="">Select...</option>
-        <option value="regular">Regular business</option>
-        <option value="holding" selected>Holding company</option>
-        <option value="freelance">Freelance / Sole proprietor</option>
+        <option value="regular">No</option>
+        <option value="holding" selected>Yes</option>
       </select>
-      <label class="field-label">Entity type</label>
+      <label class="field-label">Holding company</label>
     </div>
 
     <!-- HOLDING REVEAL -->
@@ -766,8 +765,8 @@
         <div class="field">
           <select class="field-select" id="incomeSelect" onchange="handleIncome(this.value)">
             <option value="">Select...</option>
-            <option value="active">Management fees, services, revenue through subsidiaries</option>
-            <option value="passive">Mainly dividends, interest, rents, royalties</option>
+            <option value="active">More than 50% from management fees, services, or revenue through subsidiaries</option>
+            <option value="passive">More than 50% from dividends, interest, rents, or royalties</option>
           </select>
           <label class="field-label">Primary income source</label>
         </div>
@@ -1073,6 +1072,7 @@ function setScenario(type) {
   } else if (type === 'notholding') {
     et.value = 'regular'; handleEntityType('regular');
     owns.value = ''; income.value = '';
+    document.getElementById('screen2BtnText').textContent = 'Next: Owners and Decision Makers';
   } else if (type === 'reject') {
     et.value = 'holding'; handleEntityType('holding');
     owns.value = 'no'; handleOwns('no');
