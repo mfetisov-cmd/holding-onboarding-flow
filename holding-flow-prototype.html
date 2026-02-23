@@ -1,0 +1,1114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vivid Money — SME Onboarding Prototype</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+  :root {
+    --purple: #7C3AED;
+    --purple-hover: #6D28D9;
+    --purple-light: #F3EEFF;
+    --purple-bg: #FAF5FF;
+    --purple-border: #DDD6FE;
+    --text: #1A1A2E;
+    --text-secondary: #6B7280;
+    --text-muted: #9CA3AF;
+    --border: #E5E7EB;
+    --border-focus: #7C3AED;
+    --bg: #FFFFFF;
+    --page-bg: #FAFAFA;
+    --green: #10B981;
+    --green-light: #D1FAE5;
+    --green-bg: #ECFDF5;
+    --red: #EF4444;
+    --red-light: #FEE2E2;
+    --yellow: #F59E0B;
+    --yellow-light: #FEF3C7;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--page-bg);
+    color: var(--text);
+    line-height: 1.5;
+  }
+
+  /* ── Demo Bar ── */
+  .demo-bar {
+    background: #1A1A2E;
+    color: white;
+    padding: 10px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 200;
+    flex-wrap: wrap;
+  }
+
+  .demo-bar-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: #9CA3AF;
+    white-space: nowrap;
+  }
+
+  .demo-btn {
+    padding: 5px 14px;
+    border-radius: 20px;
+    border: 1px solid #374151;
+    background: transparent;
+    color: #D1D5DB;
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .demo-btn:hover { border-color: var(--purple); color: white; }
+  .demo-btn.active { background: var(--purple); border-color: var(--purple); color: white; }
+
+  .demo-step-btns {
+    margin-left: auto;
+    display: flex;
+    gap: 6px;
+  }
+
+  .demo-step {
+    width: 32px;
+    height: 28px;
+    border-radius: 6px;
+    border: 1px solid #374151;
+    background: transparent;
+    color: #9CA3AF;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: inherit;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+
+  .demo-step:hover { border-color: #6B7280; color: white; }
+  .demo-step.active { background: var(--purple); border-color: var(--purple); color: white; }
+
+  /* ── Top Nav ── */
+  .top-nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 40px;
+    background: white;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-tabs { display: flex; gap: 28px; }
+
+  .nav-tab {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-muted);
+    cursor: pointer;
+    padding: 4px 0;
+  }
+
+  .nav-tab.active { color: var(--text); font-weight: 600; }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .brand-vivid { font-weight: 800; color: var(--purple); font-size: 20px; letter-spacing: -0.5px; }
+  .brand-sep { color: var(--text-muted); font-weight: 300; }
+  .brand-company { font-weight: 600; font-size: 14px; }
+  .brand-chevron { color: var(--purple); cursor: pointer; font-size: 11px; }
+
+  /* ── Main ── */
+  .main {
+    max-width: 480px;
+    margin: 0 auto;
+    padding: 40px 20px 140px;
+  }
+
+  .step-label {
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .step-label span { color: var(--text-muted); font-weight: 400; }
+
+  .step-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 28px;
+  }
+
+  /* ── Fields ── */
+  .field {
+    position: relative;
+    margin-bottom: 14px;
+  }
+
+  .field-input {
+    width: 100%;
+    padding: 22px 16px 8px;
+    font-size: 15px;
+    font-family: inherit;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: white;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .field-input:focus { border-color: var(--border-focus); }
+
+  .field-label {
+    position: absolute;
+    top: 8px;
+    left: 16px;
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 500;
+    pointer-events: none;
+  }
+
+  .field-select {
+    width: 100%;
+    padding: 22px 16px 8px;
+    font-size: 15px;
+    font-family: inherit;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: white;
+    color: var(--text);
+    outline: none;
+    appearance: none;
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3Csvg width='12' height='8' viewBox='0 0 12 8' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1.5L6 6.5L11 1.5' stroke='%239CA3AF' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    transition: border-color 0.2s;
+  }
+
+  .field-select:focus { border-color: var(--border-focus); }
+
+  .field-with-flag { position: relative; }
+  .field-flag {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 18px;
+    z-index: 1;
+  }
+  .field-with-flag .field-select { padding-left: 42px; }
+  .field-with-flag .field-label { left: 42px; }
+
+  .field-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  .field-row .field { flex: 1; }
+
+  .field-question {
+    font-size: 14px;
+    color: var(--text);
+    font-weight: 500;
+    margin-bottom: 10px;
+  }
+
+  .field-textarea {
+    width: 100%;
+    padding: 22px 16px 8px;
+    font-size: 15px;
+    font-family: inherit;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: white;
+    color: var(--text);
+    outline: none;
+    resize: none;
+    min-height: 60px;
+    transition: border-color 0.2s;
+  }
+
+  .field-textarea:focus { border-color: var(--border-focus); }
+
+  /* ── Checkbox ── */
+  .check-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .check-box {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+  }
+
+  .check-box.off { border: 2px solid var(--border); background: white; }
+  .check-box.on { border: none; background: var(--purple); }
+  .check-box .tick { color: white; font-size: 12px; font-weight: 700; }
+
+  .check-label { font-size: 14px; }
+
+  /* ── Divider ── */
+  .divider { border: none; border-top: 1px solid var(--border); margin: 24px 0; }
+
+  /* ── Section Header ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .section-title { font-size: 13px; font-weight: 700; color: var(--purple); }
+
+  .badge {
+    font-size: 9px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .badge-new { background: var(--purple-light); color: var(--purple); }
+  .badge-required { background: var(--yellow-light); color: var(--yellow); }
+  .badge-ok { background: var(--green-light); color: var(--green); }
+
+  .section-hint {
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 14px;
+  }
+
+  .add-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--purple);
+    cursor: pointer;
+    padding: 6px 0;
+  }
+
+  .add-link:hover { text-decoration: underline; }
+
+  /* ── Reveal ── */
+  .reveal {
+    overflow: hidden;
+    max-height: 0;
+    opacity: 0;
+    transition: max-height 0.4s ease, opacity 0.25s ease;
+  }
+
+  .reveal.open { max-height: 3000px; opacity: 1; }
+
+  /* ── Subsidiary Cards ── */
+  .sub-card {
+    display: flex;
+    align-items: center;
+    padding: 12px 14px;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 10px;
+    background: white;
+    gap: 12px;
+  }
+
+  .sub-info { flex: 1; min-width: 0; }
+  .sub-name { font-size: 14px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .sub-detail { font-size: 11px; color: var(--text-secondary); }
+
+  .sub-pct-input {
+    width: 52px;
+    padding: 6px 4px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 14px;
+    font-family: inherit;
+    text-align: center;
+    outline: none;
+  }
+
+  .sub-pct-input:focus { border-color: var(--purple); }
+  .sub-pct-label { font-size: 12px; color: var(--text-muted); }
+
+  .sub-remove {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    border: none;
+    background: var(--page-bg);
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .sub-remove:hover { background: var(--red-light); color: var(--red); }
+
+  /* ── Search ── */
+  .search-box {
+    position: relative;
+    margin-bottom: 14px;
+  }
+
+  .search-input {
+    width: 100%;
+    padding: 14px 44px 14px 16px;
+    font-size: 15px;
+    font-family: inherit;
+    border: 1.5px solid var(--border);
+    border-radius: 12px;
+    background: white;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+
+  .search-input:focus { border-color: var(--purple); }
+  .search-input::placeholder { color: var(--text-muted); }
+
+  .search-icon {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text-muted);
+    font-size: 18px;
+  }
+
+  .search-results {
+    border: 1.5px solid var(--purple-border);
+    border-radius: 12px;
+    background: white;
+    overflow: hidden;
+    box-shadow: var(--shadow-md);
+    margin-bottom: 14px;
+    display: none;
+  }
+
+  .search-results.visible { display: block; }
+
+  .search-count {
+    padding: 8px 16px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    background: var(--page-bg);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .search-result {
+    padding: 12px 16px;
+    cursor: pointer;
+    border-bottom: 1px solid #F3F4F6;
+    transition: background 0.12s;
+  }
+
+  .search-result:last-child { border-bottom: none; }
+  .search-result:hover { background: var(--purple-bg); }
+  .sr-name { font-size: 14px; font-weight: 600; }
+  .sr-detail { font-size: 12px; color: var(--text-secondary); }
+
+  /* ── CRS Group ── */
+  .crs-group {
+    background: var(--purple-bg);
+    border: 1.5px solid var(--purple-border);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+  }
+
+  .crs-group .field { margin-bottom: 10px; }
+  .crs-group .field:last-child { margin-bottom: 0; }
+
+  /* ── Info Callout ── */
+  .callout {
+    display: flex;
+    gap: 10px;
+    padding: 12px 14px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    align-items: flex-start;
+  }
+
+  .callout-purple { background: var(--purple-light); }
+  .callout-green { background: var(--green-bg); border: 1px solid #A7F3D0; }
+  .callout-red { background: var(--red-light); border: 1px solid #FECACA; }
+
+  .callout-icon { font-size: 18px; flex-shrink: 0; }
+  .callout-text { font-size: 13px; line-height: 1.5; }
+  .callout-dismiss { margin-left: auto; cursor: pointer; color: var(--text-muted); flex-shrink: 0; font-size: 14px; }
+
+  /* ── Outcome Banner ── */
+  .outcome {
+    text-align: center;
+    padding: 24px;
+    border-radius: 12px;
+    margin: 20px 0;
+    display: none;
+  }
+
+  .outcome.visible { display: block; }
+  .outcome.approve { background: var(--green-bg); border: 1.5px solid #6EE7B7; }
+  .outcome.reject { background: var(--red-light); border: 1.5px solid #FECACA; }
+
+  .outcome h3 { font-size: 16px; margin-bottom: 4px; }
+  .outcome p { font-size: 13px; color: var(--text-secondary); }
+  .outcome.approve h3 { color: var(--green); }
+  .outcome.reject h3 { color: var(--red); }
+
+  /* ── UBO ── */
+  .ubo-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+
+  .ubo-title { font-size: 16px; font-weight: 700; }
+
+  .ubo-add {
+    padding: 5px 14px;
+    border: 1.5px solid var(--purple);
+    border-radius: 20px;
+    background: white;
+    color: var(--purple);
+    font-size: 12px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .ubo-name { font-size: 17px; font-weight: 600; margin-bottom: 14px; }
+
+  .btn-pair { display: flex; gap: 12px; margin: 8px 0 20px; }
+
+  .btn-save {
+    padding: 10px 28px;
+    background: var(--purple-light);
+    color: var(--purple);
+    border: none;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  .btn-cancel {
+    padding: 10px 28px;
+    background: white;
+    color: var(--purple);
+    border: 1.5px solid var(--border);
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+  }
+
+  /* ── Bottom Bar ── */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    padding: 14px 32px;
+    background: white;
+    border-top: 1px solid var(--border);
+    z-index: 100;
+    gap: 16px;
+  }
+
+  .back-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+
+  .back-btn:hover { border-color: var(--text-muted); }
+
+  .btn-primary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    background: var(--purple);
+    color: white;
+    border: none;
+    border-radius: 40px;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: inherit;
+    cursor: pointer;
+    flex: 1;
+    max-width: 340px;
+    transition: background 0.2s;
+  }
+
+  .btn-primary:hover { background: var(--purple-hover); }
+  .btn-primary .arrow { font-size: 16px; }
+  .btn-primary:disabled { background: #C4B5FD; cursor: not-allowed; }
+
+  .progress-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+  }
+
+  .progress-pct { font-size: 20px; font-weight: 700; }
+  .progress-lbl { font-size: 10px; color: var(--text-muted); }
+
+  .progress-ring svg { transform: rotate(-90deg); }
+  .progress-ring .bg { fill: none; stroke: var(--border); stroke-width: 3.5; }
+  .progress-ring .fill { fill: none; stroke: url(#pg); stroke-width: 3.5; stroke-linecap: round; transition: stroke-dashoffset 0.5s; }
+
+  .chat-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--text);
+    color: white;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  /* ── Screens ── */
+  .screen { display: none; }
+  .screen.active { display: block; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0"><defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#7C3AED"/><stop offset="100%" stop-color="#10B981"/></linearGradient></defs></svg>
+
+<!-- ═══ DEMO BAR ═══ -->
+<div class="demo-bar">
+  <span class="demo-bar-label">Scenario:</span>
+  <button class="demo-btn active" onclick="setScenario('active')">Active Holding</button>
+  <button class="demo-btn" onclick="setScenario('passive')">Passive Holding</button>
+  <button class="demo-btn" onclick="setScenario('plans')">Plans to Acquire</button>
+  <button class="demo-btn" onclick="setScenario('notholding')">Not a Holding</button>
+  <button class="demo-btn" onclick="setScenario('reject')">Rejection</button>
+  <div class="demo-step-btns">
+    <button class="demo-step active" onclick="goTo(1)">1</button>
+    <button class="demo-step" onclick="goTo(2)">2</button>
+    <button class="demo-step" onclick="goTo(3)" id="demoStep3">3</button>
+    <button class="demo-step" onclick="goTo(4)">4</button>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 1: Company Information ═══ -->
+<div class="screen active" data-screen="1">
+  <nav class="top-nav">
+    <div class="nav-tabs">
+      <div class="nav-tab active">Company</div>
+      <div class="nav-tab">Owners and Decision Makers</div>
+      <div class="nav-tab">Personal</div>
+    </div>
+    <div class="brand">
+      <span class="brand-vivid">vivid</span>
+      <span class="brand-sep">×</span>
+      <span class="brand-company">Nexus Holding UG</span>
+      <span class="brand-chevron">▼</span>
+    </div>
+  </nav>
+  <div class="main">
+    <div class="step-label"><span>1/4.</span> Company information</div>
+
+    <div class="field"><input class="field-input" value="Nexus Holding UG" readonly><label class="field-label">Business legal name</label></div>
+    <div class="field"><select class="field-select"><option>UG (haftungsbeschränkt)</option></select><label class="field-label">Legal form</label></div>
+    <div class="field"><input class="field-input" value="HRB 298451B" readonly><label class="field-label">Registration number</label></div>
+    <div class="field"><input class="field-input" value="15.03.2024" readonly><label class="field-label">Registration date</label></div>
+
+    <hr class="divider">
+
+    <div class="section-header">
+      <span class="section-title">Tax information</span>
+      <span class="badge badge-new">New — optional</span>
+    </div>
+    <div class="section-hint">You may be tax resident in more than one country. Add all applicable jurisdictions.</div>
+
+    <div class="field-row">
+      <div class="field"><div class="field-with-flag"><span class="field-flag">🇩🇪</span><select class="field-select"><option>Germany</option></select><label class="field-label">Tax residence</label></div></div>
+      <div class="field"><input class="field-input" value="12/345/67890"><label class="field-label">TIN</label></div>
+    </div>
+
+    <div class="field-row">
+      <div class="field"><input class="field-input" value="DE123456789"><label class="field-label">VAT number (optional)</label></div>
+      <div class="field"><input class="field-input" placeholder="Website"><label class="field-label">Website (optional)</label></div>
+    </div>
+
+    <div class="add-link">+ Add another tax residence</div>
+  </div>
+  <div class="bottom-bar">
+    <button class="back-btn">←</button>
+    <button class="btn-primary" onclick="goTo(2)"><span>Next: Business Details</span><span class="arrow">→</span></button>
+    <div class="progress-area">
+      <div><div class="progress-pct">30%</div><div class="progress-lbl">Application progress</div></div>
+      <div class="progress-ring"><svg width="40" height="40" viewBox="0 0 40 40"><circle class="bg" cx="20" cy="20" r="16"/><circle class="fill" cx="20" cy="20" r="16" stroke-dasharray="100" stroke-dashoffset="70"/></svg></div>
+      <button class="chat-btn">💬</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 2: Business Details ═══ -->
+<div class="screen" data-screen="2">
+  <nav class="top-nav">
+    <div class="nav-tabs">
+      <div class="nav-tab active">Company</div>
+      <div class="nav-tab">Owners and Decision Makers</div>
+      <div class="nav-tab">Personal</div>
+    </div>
+    <div class="brand">
+      <span class="brand-vivid">vivid</span><span class="brand-sep">×</span><span class="brand-company">Nexus Holding UG</span><span class="brand-chevron">▼</span>
+    </div>
+  </nav>
+  <div class="main">
+    <div class="step-label"><span>2/4.</span> Business details</div>
+    <div class="step-desc">We require certain information for regulatory reasons.</div>
+
+    <div class="field-question">Select the primary country of business activity</div>
+    <div class="field"><div class="field-with-flag"><span class="field-flag">🇩🇪</span><select class="field-select"><option>Germany</option></select><label class="field-label">Country</label></div></div>
+
+    <div class="field-question">What's your company average annual turnover?</div>
+    <div class="field"><select class="field-select" id="turnoverSelect"><option>Less than 20,000 €</option><option>20,000 – 100,000 €</option><option>100,000 – 500,000 €</option><option>More than 500,000 €</option></select><label class="field-label">Average monthly revenue</label></div>
+
+    <div class="field-question">What type of business is this?</div>
+    <div class="field">
+      <select class="field-select" id="entityTypeSelect" onchange="handleEntityType(this.value)">
+        <option value="">Select...</option>
+        <option value="regular">Regular business</option>
+        <option value="holding" selected>Holding company</option>
+        <option value="freelance">Freelance / Sole proprietor</option>
+      </select>
+      <label class="field-label">Entity type</label>
+    </div>
+
+    <!-- HOLDING REVEAL -->
+    <div class="reveal open" id="holdingSection">
+      <div class="crs-group" style="background: white; border-color: var(--border);">
+        <div class="section-header" style="margin-bottom: 10px;">
+          <span class="section-title" style="color: var(--text);">Holding company details</span>
+        </div>
+
+        <div class="field-question">Do you currently own or control other companies?</div>
+        <div class="field">
+          <select class="field-select" id="ownsSelect" onchange="handleOwns(this.value)">
+            <option value="">Select...</option>
+            <option value="yes">Yes, we own other companies</option>
+            <option value="plans">Not yet, but we plan to acquire</option>
+            <option value="no">No, and no plans to</option>
+          </select>
+          <label class="field-label">Ownership status</label>
+        </div>
+
+        <div class="reveal" id="ownsYesReveal">
+          <div class="callout callout-purple" style="margin-top: 10px;">
+            <span class="callout-icon">💡</span>
+            <span class="callout-text">You'll add your subsidiaries on the next screen using company search.</span>
+          </div>
+        </div>
+
+        <div class="reveal" id="plansReveal">
+          <div class="callout callout-green" style="margin-top: 10px;">
+            <span class="callout-icon">✓</span>
+            <span class="callout-text">You can open an account while planning your acquisitions. We'll classify your entity as a Passive NFE for reporting purposes.</span>
+          </div>
+        </div>
+
+        <div class="reveal" id="rejectReveal">
+          <div class="outcome reject visible" style="margin-top: 10px;">
+            <h3>Unable to proceed</h3>
+            <p>We currently serve companies with active business operations or plans to acquire other businesses.</p>
+          </div>
+        </div>
+
+        <div class="reveal" id="incomeReveal">
+          <hr class="divider" style="margin: 16px 0 12px;">
+          <div class="field-question">How does your company primarily generate income?</div>
+          <div class="field">
+            <select class="field-select" id="incomeSelect" onchange="handleIncome(this.value)">
+              <option value="">Select...</option>
+              <option value="active">Active — management fees, services, revenue through subsidiaries</option>
+              <option value="passive">Passive — mainly dividends, interest, rents, royalties</option>
+            </select>
+            <label class="field-label">Primary income source</label>
+          </div>
+
+          <div class="reveal" id="activeResult">
+            <div class="outcome approve visible" style="margin-top: 8px;">
+              <h3>Active NFE ✓</h3>
+              <p>Your company qualifies as an Active Non-Financial Entity. Standard onboarding applies.</p>
+            </div>
+          </div>
+
+          <div class="reveal" id="passiveResult">
+            <div class="outcome approve visible" style="margin-top: 8px;">
+              <h3>Passive NFE — additional data required</h3>
+              <p>Your company is classified as a Passive NFE. We'll need tax reporting data for each beneficial owner on the next steps.</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <hr class="divider">
+
+    <div class="field-question">What's your business about? Add details about the goods and services you offer and your main source of revenue</div>
+    <div class="field"><textarea class="field-textarea" placeholder="Add a description">Unternehmensberatung und Halten von Beteiligungen an operativen Gesellschaften</textarea></div>
+
+    <div class="check-row">
+      <div class="check-box on"><span class="tick">✓</span></div>
+      <span class="check-label">I want to withdraw cash from my account</span>
+    </div>
+    <div class="field"><input class="field-input" value="0"><label class="field-label">Expected monthly cash withdrawals (€)</label></div>
+  </div>
+  <div class="bottom-bar">
+    <button class="back-btn" onclick="goTo(1)">←</button>
+    <button class="btn-primary" id="screen2Btn" onclick="goToNext2()"><span id="screen2BtnText">Next: Add Subsidiaries</span><span class="arrow">→</span></button>
+    <div class="progress-area">
+      <div><div class="progress-pct">42%</div><div class="progress-lbl">Application progress</div></div>
+      <div class="progress-ring"><svg width="40" height="40" viewBox="0 0 40 40"><circle class="bg" cx="20" cy="20" r="16"/><circle class="fill" cx="20" cy="20" r="16" stroke-dasharray="100" stroke-dashoffset="58"/></svg></div>
+      <button class="chat-btn">💬</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 3: Subsidiaries ═══ -->
+<div class="screen" data-screen="3">
+  <nav class="top-nav">
+    <div class="nav-tabs">
+      <div class="nav-tab active">Company</div>
+      <div class="nav-tab">Owners and Decision Makers</div>
+      <div class="nav-tab">Personal</div>
+    </div>
+    <div class="brand">
+      <span class="brand-vivid">vivid</span><span class="brand-sep">×</span><span class="brand-company">Nexus Holding UG</span><span class="brand-chevron">▼</span>
+    </div>
+  </nav>
+  <div class="main">
+    <div class="step-label"><span>3/4.</span> Your subsidiaries</div>
+    <div class="step-desc">Search for each company your business owns and enter the ownership percentage.</div>
+
+    <div class="search-box">
+      <input class="search-input" id="subSearch" placeholder="Search company by name..." oninput="handleSubSearch(this.value)" autocomplete="off">
+      <span class="search-icon">🔍</span>
+    </div>
+
+    <div class="search-results" id="subResults">
+      <div class="search-count">5 companies found</div>
+      <div class="search-result" onclick="addSub('AlphaWerk Consulting GmbH','HRB 187234 · Berlin')"><div class="sr-name">AlphaWerk Consulting GmbH</div><div class="sr-detail">HRB 187234 · Berliner Str. 42, Berlin, 10115</div></div>
+      <div class="search-result" onclick="addSub('AlphaTech Solutions GmbH','HRB 201887 · Munich')"><div class="sr-name">AlphaTech Solutions GmbH</div><div class="sr-detail">HRB 201887 · Münchener Str. 8, Munich, 80331</div></div>
+      <div class="search-result" onclick="addSub('Alpha Digital Services UG','HRB 312956 · Hamburg')"><div class="sr-name">Alpha Digital Services UG</div><div class="sr-detail">HRB 312956 · Hauptstr. 15, Hamburg, 20095</div></div>
+      <div class="search-result" onclick="addSub('Alpha Immobilien GmbH','HRB 445012 · Frankfurt')"><div class="sr-name">Alpha Immobilien GmbH</div><div class="sr-detail">HRB 445012 · Kaiserstr. 60, Frankfurt, 60329</div></div>
+      <div class="search-result" onclick="addSub('Alpha Ventures KG','HRA 78234 · Düsseldorf')"><div class="sr-name">Alpha Ventures KG</div><div class="sr-detail">HRA 78234 · Königsallee 1, Düsseldorf, 40212</div></div>
+    </div>
+
+    <div id="subList"></div>
+
+    <div id="subEmpty" style="text-align:center; padding: 40px 0; color: var(--text-muted);">
+      <div style="font-size: 40px; margin-bottom: 8px;">🏢</div>
+      <div style="font-size: 14px;">Search and add your subsidiaries above</div>
+    </div>
+  </div>
+  <div class="bottom-bar">
+    <button class="back-btn" onclick="goTo(2)">←</button>
+    <button class="btn-primary" id="screen3Btn" onclick="goTo(4)" disabled><span>Next: Owners and Decision Makers</span><span class="arrow">→</span></button>
+    <div class="progress-area">
+      <div><div class="progress-pct">55%</div><div class="progress-lbl">Application progress</div></div>
+      <div class="progress-ring"><svg width="40" height="40" viewBox="0 0 40 40"><circle class="bg" cx="20" cy="20" r="16"/><circle class="fill" cx="20" cy="20" r="16" stroke-dasharray="100" stroke-dashoffset="45"/></svg></div>
+      <button class="chat-btn">💬</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 4: Owners & Decision Makers ═══ -->
+<div class="screen" data-screen="4">
+  <nav class="top-nav">
+    <div class="nav-tabs">
+      <div class="nav-tab">Company</div>
+      <div class="nav-tab active">Owners and Decision Makers</div>
+      <div class="nav-tab">Personal</div>
+    </div>
+    <div class="brand">
+      <span class="brand-vivid">vivid</span><span class="brand-sep">×</span><span class="brand-company">Nexus Holding UG</span><span class="brand-chevron">▼</span>
+    </div>
+  </nav>
+  <div class="main">
+    <div class="step-label"><span>4/4.</span> Owners and Decision Makers</div>
+
+    <div class="ubo-header">
+      <span class="ubo-title">Add beneficial owner</span>
+      <button class="ubo-add">Add</button>
+    </div>
+
+    <div class="callout callout-purple">
+      <span class="callout-icon">⚡</span>
+      <span class="callout-text">Please add all individuals who own more than 25% of the company shares or have control over its management.</span>
+      <span class="callout-dismiss">✕</span>
+    </div>
+
+    <div class="ubo-name">Thomas Müller</div>
+
+    <div class="field"><input class="field-input" value="Thomas"><label class="field-label">First name</label></div>
+    <div class="field"><input class="field-input" value="Müller"><label class="field-label">Last name</label></div>
+    <div class="field"><input class="field-input" value="t.mueller@nexus.de"><label class="field-label">Email</label></div>
+    <div class="field"><input class="field-input" value="100%"><label class="field-label">Ownership percentage</label></div>
+    <div class="field"><input class="field-input" value="15.06.1985"><label class="field-label">Date of birth</label></div>
+    <div class="field"><div class="field-with-flag"><span class="field-flag">🇩🇪</span><select class="field-select"><option>Germany</option></select><label class="field-label">Country of birth</label></div></div>
+    <div class="field"><div class="field-with-flag"><span class="field-flag">🇩🇪</span><select class="field-select"><option>Germany</option></select><label class="field-label">Country of citizenship</label></div></div>
+    <div class="field"><div class="field-with-flag"><span class="field-flag">🇩🇪</span><select class="field-select"><option>Germany</option></select><label class="field-label">Residence country</label></div></div>
+    <div class="field"><input class="field-input" value="Friedrichstr. 112, Berlin, 10117"><label class="field-label">Residential address</label></div>
+
+    <hr class="divider">
+
+    <!-- CRS UBO FIELDS -->
+    <div class="crs-group" id="uboCrs">
+      <div class="section-header" style="margin-bottom: 4px;">
+        <span class="section-title">Tax reporting (CRS)</span>
+        <span class="badge" id="uboBadge">New — optional</span>
+      </div>
+      <div class="section-hint" id="uboHint">Required for controlling persons of Passive NFE entities.</div>
+
+      <div class="field-row">
+        <div class="field"><div class="field-with-flag"><span class="field-flag">🇩🇪</span><select class="field-select"><option>Germany</option></select><label class="field-label">Tax residence</label></div></div>
+        <div class="field"><input class="field-input" value="12 345 678 901"><label class="field-label">TIN</label></div>
+      </div>
+
+      <div class="add-link">+ Add another tax residence</div>
+
+      <hr class="divider" style="margin: 10px 0;">
+
+      <div class="field"><input class="field-input" value="Berlin"><label class="field-label">Place of birth</label></div>
+
+      <div class="field">
+        <select class="field-select">
+          <option>Ownership (direct shareholding)</option>
+          <option>Control by other means</option>
+        </select>
+        <label class="field-label">Nature of control</label>
+      </div>
+    </div>
+
+    <div class="btn-pair">
+      <button class="btn-save">Save</button>
+      <button class="btn-cancel">Cancel</button>
+    </div>
+
+    <div class="ubo-header">
+      <span class="ubo-title">Add beneficial owner</span>
+      <button class="ubo-add">Add</button>
+    </div>
+  </div>
+  <div class="bottom-bar">
+    <button class="back-btn" onclick="goTo(3)">←</button>
+    <button class="btn-primary" onclick="alert('Continue to Personal section →')"><span>Save & Continue</span><span class="arrow">→</span></button>
+    <div class="progress-area">
+      <div><div class="progress-pct">65%</div><div class="progress-lbl">Application progress</div></div>
+      <div class="progress-ring"><svg width="40" height="40" viewBox="0 0 40 40"><circle class="bg" cx="20" cy="20" r="16"/><circle class="fill" cx="20" cy="20" r="16" stroke-dasharray="100" stroke-dashoffset="35"/></svg></div>
+      <button class="chat-btn">💬</button>
+    </div>
+  </div>
+</div>
+
+<script>
+let subs = [];
+let currentScenario = 'active';
+
+function goTo(n) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelector(`[data-screen="${n}"]`).classList.add('active');
+  document.querySelectorAll('.demo-step').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.demo-step')[n-1].classList.add('active');
+  window.scrollTo(0, 0);
+
+  if (n === 4) updateUboCrs();
+}
+
+function goToNext2() {
+  const owns = document.getElementById('ownsSelect').value;
+  if (owns === 'yes') goTo(3);
+  else goTo(4);
+}
+
+function handleEntityType(val) {
+  const section = document.getElementById('holdingSection');
+  if (val === 'holding') {
+    section.classList.add('open');
+  } else {
+    section.classList.remove('open');
+    document.getElementById('screen2BtnText').textContent = 'Next: Owners and Decision Makers';
+  }
+}
+
+function handleOwns(val) {
+  closeAll(['ownsYesReveal','plansReveal','rejectReveal','incomeReveal','activeResult','passiveResult']);
+
+  if (val === 'yes') {
+    open('ownsYesReveal');
+    open('incomeReveal');
+    document.getElementById('screen2BtnText').textContent = 'Next: Add Subsidiaries';
+    document.getElementById('screen2Btn').disabled = false;
+  } else if (val === 'plans') {
+    open('plansReveal');
+    document.getElementById('screen2BtnText').textContent = 'Next: Owners and Decision Makers';
+    document.getElementById('screen2Btn').disabled = false;
+    document.getElementById('incomeSelect').value = 'passive';
+  } else if (val === 'no') {
+    open('rejectReveal');
+    document.getElementById('screen2Btn').disabled = true;
+  } else {
+    document.getElementById('screen2Btn').disabled = false;
+  }
+}
+
+function handleIncome(val) {
+  closeAll(['activeResult','passiveResult']);
+  if (val === 'active') open('activeResult');
+  else if (val === 'passive') open('passiveResult');
+}
+
+function open(id) { document.getElementById(id).classList.add('open'); }
+function close(id) { document.getElementById(id).classList.remove('open'); }
+function closeAll(ids) { ids.forEach(close); }
+
+function handleSubSearch(val) {
+  document.getElementById('subResults').classList.toggle('visible', val.length >= 2);
+}
+
+function addSub(name, detail) {
+  subs.push({ name, detail });
+  document.getElementById('subResults').classList.remove('visible');
+  document.getElementById('subSearch').value = '';
+  renderSubs();
+}
+
+function removeSub(i) {
+  subs.splice(i, 1);
+  renderSubs();
+}
+
+function renderSubs() {
+  const list = document.getElementById('subList');
+  const empty = document.getElementById('subEmpty');
+  const btn = document.getElementById('screen3Btn');
+
+  empty.style.display = subs.length ? 'none' : 'block';
+  btn.disabled = subs.length === 0;
+
+  list.innerHTML = subs.map((s, i) => `
+    <div class="sub-card">
+      <div class="sub-info"><div class="sub-name">${s.name}</div><div class="sub-detail">${s.detail}</div></div>
+      <div style="display:flex;align-items:center;gap:6px;">
+        <input class="sub-pct-input" value="${[60,25,15][i] || ''}" placeholder="%">
+        <span class="sub-pct-label">%</span>
+        <button class="sub-remove" onclick="removeSub(${i})">✕</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function updateUboCrs() {
+  const badge = document.getElementById('uboBadge');
+  const hint = document.getElementById('uboHint');
+  const owns = document.getElementById('ownsSelect').value;
+  const income = document.getElementById('incomeSelect').value;
+
+  if (income === 'passive' || owns === 'plans') {
+    badge.className = 'badge badge-required';
+    badge.textContent = 'Required — Passive NFE';
+    hint.textContent = 'Your entity is classified as Passive NFE. This data is required for CRS tax reporting for each controlling person.';
+  } else {
+    badge.className = 'badge badge-new';
+    badge.textContent = 'New — optional';
+    hint.textContent = 'Optional for Active NFE entities. Will become mandatory for CRS reporting.';
+  }
+}
+
+function setScenario(type) {
+  currentScenario = type;
+  document.querySelectorAll('.demo-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+
+  subs = [];
+  renderSubs();
+
+  const et = document.getElementById('entityTypeSelect');
+  const owns = document.getElementById('ownsSelect');
+  const income = document.getElementById('incomeSelect');
+
+  closeAll(['ownsYesReveal','plansReveal','rejectReveal','incomeReveal','activeResult','passiveResult']);
+
+  if (type === 'active') {
+    et.value = 'holding'; handleEntityType('holding');
+    owns.value = 'yes'; handleOwns('yes');
+    income.value = 'active'; handleIncome('active');
+  } else if (type === 'passive') {
+    et.value = 'holding'; handleEntityType('holding');
+    owns.value = 'yes'; handleOwns('yes');
+    income.value = 'passive'; handleIncome('passive');
+  } else if (type === 'plans') {
+    et.value = 'holding'; handleEntityType('holding');
+    owns.value = 'plans'; handleOwns('plans');
+  } else if (type === 'notholding') {
+    et.value = 'regular'; handleEntityType('regular');
+    owns.value = ''; income.value = '';
+  } else if (type === 'reject') {
+    et.value = 'holding'; handleEntityType('holding');
+    owns.value = 'no'; handleOwns('no');
+  }
+
+  goTo(1);
+}
+</script>
+
+</body>
+</html>

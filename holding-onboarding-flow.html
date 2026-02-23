@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Holding Company Onboarding Flow — Vivid Money</title>
+<style>
+  :root {
+    --bg: #fafafa;
+    --card: #ffffff;
+    --border: #e2e8f0;
+    --text: #1a202c;
+    --text-secondary: #64748b;
+    --accent: #6366f1;
+    --accent-light: #e0e7ff;
+    --green: #10b981;
+    --green-light: #d1fae5;
+    --green-border: #6ee7b7;
+    --red: #ef4444;
+    --red-light: #fee2e2;
+    --red-border: #fca5a5;
+    --yellow: #f59e0b;
+    --yellow-light: #fef3c7;
+    --yellow-border: #fcd34d;
+    --blue: #3b82f6;
+    --blue-light: #dbeafe;
+    --blue-border: #93c5fd;
+    --purple: #8b5cf6;
+    --purple-light: #ede9fe;
+    --purple-border: #c4b5fd;
+    --gray: #6b7280;
+    --gray-light: #f3f4f6;
+    --gray-border: #d1d5db;
+    --connector: #94a3b8;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+    --shadow-lg: 0 4px 12px rgba(0,0,0,0.1), 0 2px 4px rgba(0,0,0,0.06);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  .header {
+    background: white;
+    border-bottom: 1px solid var(--border);
+    padding: 24px 40px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header h1 {
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .header p {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-top: 4px;
+  }
+
+  .tabs {
+    display: flex;
+    gap: 0;
+    margin-top: 16px;
+    border-bottom: 2px solid var(--border);
+  }
+
+  .tab {
+    padding: 8px 20px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -2px;
+    transition: all 0.2s;
+    user-select: none;
+  }
+
+  .tab:hover { color: var(--text); }
+
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+  }
+
+  .content {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 40px 40px 80px;
+  }
+
+  .section { display: none; }
+  .section.active { display: block; }
+
+  .section-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+
+  .section-desc {
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 32px;
+  }
+
+  /* Flow nodes */
+  .flow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .node {
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: 12px;
+    padding: 16px 24px;
+    max-width: 480px;
+    width: 100%;
+    text-align: center;
+    box-shadow: var(--shadow);
+    position: relative;
+    transition: all 0.2s;
+  }
+
+  .node:hover {
+    box-shadow: var(--shadow-lg);
+    transform: translateY(-1px);
+  }
+
+  .node-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+
+  .node-text {
+    font-size: 15px;
+    font-weight: 500;
+  }
+
+  .node-detail {
+    font-size: 13px;
+    color: var(--text-secondary);
+    margin-top: 6px;
+  }
+
+  .node.trigger {
+    border-color: var(--purple-border);
+    background: var(--purple-light);
+  }
+  .node.trigger .node-label { color: var(--purple); }
+
+  .node.question {
+    border-color: var(--blue-border);
+    background: var(--blue-light);
+    border-radius: 12px;
+  }
+  .node.question .node-label { color: var(--blue); }
+
+  .node.action {
+    border-color: var(--yellow-border);
+    background: var(--yellow-light);
+  }
+  .node.action .node-label { color: var(--yellow); }
+
+  .node.outcome-approve {
+    border-color: var(--green-border);
+    background: var(--green-light);
+  }
+  .node.outcome-approve .node-label { color: var(--green); }
+
+  .node.outcome-reject {
+    border-color: var(--red-border);
+    background: var(--red-light);
+  }
+  .node.outcome-reject .node-label { color: var(--red); }
+
+  .node.outcome-skip {
+    border-color: var(--gray-border);
+    background: var(--gray-light);
+  }
+  .node.outcome-skip .node-label { color: var(--gray); }
+
+  .node.data-collect {
+    border-color: var(--accent);
+    background: var(--accent-light);
+    border-style: dashed;
+  }
+  .node.data-collect .node-label { color: var(--accent); }
+
+  /* Connectors */
+  .connector {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 4px 0;
+  }
+
+  .connector-line {
+    width: 2px;
+    height: 24px;
+    background: var(--connector);
+  }
+
+  .connector-label {
+    font-size: 12px;
+    font-weight: 600;
+    padding: 2px 12px;
+    border-radius: 20px;
+    background: white;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    white-space: nowrap;
+  }
+
+  .connector-label.yes { background: var(--green-light); color: var(--green); border-color: var(--green-border); }
+  .connector-label.no { background: var(--red-light); color: var(--red); border-color: var(--red-border); }
+
+  /* Branch */
+  .branch {
+    display: flex;
+    gap: 24px;
+    width: 100%;
+    max-width: 720px;
+    justify-content: center;
+  }
+
+  .branch-path {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+    max-width: 340px;
+  }
+
+  .branch-connector {
+    display: flex;
+    width: 100%;
+    max-width: 720px;
+    position: relative;
+    height: 40px;
+    justify-content: center;
+  }
+
+  .branch-connector::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    width: 2px;
+    height: 20px;
+    background: var(--connector);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+
+  .branch-connector::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    height: 2px;
+    background: var(--connector);
+    left: calc(25% + 12px);
+    right: calc(25% + 12px);
+  }
+
+  .branch-arm {
+    position: absolute;
+    top: 20px;
+    width: 2px;
+    height: 20px;
+    background: var(--connector);
+  }
+  .branch-arm.left { left: calc(25% + 12px); }
+  .branch-arm.right { right: calc(25% + 12px); }
+
+  /* Sub-branch for 3 paths */
+  .branch-3 {
+    display: flex;
+    gap: 16px;
+    width: 100%;
+    max-width: 900px;
+    justify-content: center;
+  }
+
+  .branch-3 .branch-path {
+    max-width: 280px;
+  }
+
+  /* Info callout */
+  .callout {
+    background: white;
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-top: 32px;
+    max-width: 480px;
+    width: 100%;
+  }
+
+  .callout-title {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+
+  .callout-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+  }
+
+  /* CRS Table */
+  .crs-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 16px;
+    font-size: 14px;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .crs-table th {
+    background: var(--gray-light);
+    font-weight: 600;
+    text-align: left;
+    padding: 12px 16px;
+    border-bottom: 2px solid var(--border);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    color: var(--text-secondary);
+  }
+
+  .crs-table td {
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+
+  .crs-table tr:last-child td { border-bottom: none; }
+  .crs-table tr:hover td { background: #f8fafc; }
+
+  .badge {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+
+  .badge.new { background: var(--accent-light); color: var(--accent); }
+  .badge.existing { background: var(--green-light); color: var(--green); }
+  .badge.conditional { background: var(--yellow-light); color: var(--yellow); }
+
+  /* Decisions table */
+  .decisions {
+    margin-top: 32px;
+  }
+
+  .decision-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+
+  .decision-card h4 {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .decision-card p {
+    font-size: 13px;
+    color: var(--text-secondary);
+  }
+
+  /* Legend */
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-bottom: 32px;
+    padding: 16px;
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+  }
+
+  .legend-dot {
+    width: 12px;
+    height: 12px;
+    border-radius: 4px;
+    border: 2px solid;
+  }
+
+  .legend-dot.trigger { background: var(--purple-light); border-color: var(--purple-border); }
+  .legend-dot.question { background: var(--blue-light); border-color: var(--blue-border); }
+  .legend-dot.action { background: var(--yellow-light); border-color: var(--yellow-border); }
+  .legend-dot.approve { background: var(--green-light); border-color: var(--green-border); }
+  .legend-dot.reject { background: var(--red-light); border-color: var(--red-border); }
+  .legend-dot.data { background: var(--accent-light); border-color: var(--accent); }
+  .legend-dot.skip { background: var(--gray-light); border-color: var(--gray-border); }
+
+  .footer {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 40px;
+  }
+
+  @media (max-width: 768px) {
+    .content { padding: 24px 16px 60px; }
+    .branch { flex-direction: column; align-items: center; }
+    .branch-connector { display: none; }
+    .header { padding: 16px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>Holding Company Onboarding — Proposed Flow</h1>
+  <p>For compliance team review &middot; February 2026 &middot; Vivid Money</p>
+  <div class="tabs">
+    <div class="tab active" data-tab="flow">Holding Onboarding Flow</div>
+    <div class="tab" data-tab="crs">CRS Data Requirements</div>
+    <div class="tab" data-tab="decisions">Key Design Decisions</div>
+  </div>
+</div>
+
+<div class="content">
+
+  <!-- TAB 1: FLOW -->
+  <section class="section active" id="flow">
+    <div class="section-title">Holding Company Onboarding Flow</div>
+    <div class="section-desc">Triggered when NACE code 6420 (Activities of holding companies) or 7010 (Activities of head offices) is detected during onboarding. All other companies follow the standard flow.</div>
+
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot trigger"></div> Trigger</div>
+      <div class="legend-item"><div class="legend-dot question"></div> Client question</div>
+      <div class="legend-item"><div class="legend-dot action"></div> System action</div>
+      <div class="legend-item"><div class="legend-dot approve"></div> Onboard</div>
+      <div class="legend-item"><div class="legend-dot reject"></div> Reject</div>
+      <div class="legend-item"><div class="legend-dot data"></div> Data collection</div>
+      <div class="legend-item"><div class="legend-dot skip"></div> Skip / Normal flow</div>
+    </div>
+
+    <div class="flow">
+
+      <div class="node trigger">
+        <div class="node-label">Trigger</div>
+        <div class="node-text">NACE code 6420 or 7010 detected</div>
+        <div class="node-detail">From CreditSafe registry data or client-declared activity</div>
+      </div>
+
+      <div class="connector"><div class="connector-line"></div></div>
+
+      <div class="node question">
+        <div class="node-label">Question 1 — Confirmation</div>
+        <div class="node-text">"Is your company a holding company?"</div>
+        <div class="node-detail">NACE codes can be wrong (set at registration, rarely updated). Client confirms.</div>
+      </div>
+
+      <div class="branch-connector">
+        <div class="branch-arm left"></div>
+        <div class="branch-arm right"></div>
+      </div>
+
+      <div class="branch">
+        <div class="branch-path">
+          <div class="connector"><div class="connector-label no">No</div><div class="connector-line"></div></div>
+          <div class="node outcome-skip">
+            <div class="node-label">Standard flow</div>
+            <div class="node-text">Continue normal onboarding</div>
+            <div class="node-detail">NACE was inaccurate — skip holding-specific questions entirely</div>
+          </div>
+        </div>
+
+        <div class="branch-path">
+          <div class="connector"><div class="connector-label yes">Yes</div><div class="connector-line"></div></div>
+
+          <div class="node question">
+            <div class="node-label">Question 2 — Ownership</div>
+            <div class="node-text">"Do you own or control other companies?"</div>
+          </div>
+
+          <div class="branch-connector">
+            <div class="branch-arm left"></div>
+            <div class="branch-arm right"></div>
+          </div>
+
+          <div class="branch">
+            <div class="branch-path">
+              <div class="connector"><div class="connector-label yes">Yes</div><div class="connector-line"></div></div>
+
+              <div class="node action">
+                <div class="node-label">Subsidiary Capture</div>
+                <div class="node-text">CreditSafe company search</div>
+                <div class="node-detail">Client searches subsidiaries by name, selects them, enters ownership %. Stored in entity graph.</div>
+              </div>
+
+              <div class="connector"><div class="connector-line"></div></div>
+
+              <div class="node action">
+                <div class="node-label">System</div>
+                <div class="node-text">Save subsidiary docs + max NACE risk in group</div>
+              </div>
+
+              <div class="connector"><div class="connector-line"></div></div>
+
+              <div class="node question">
+                <div class="node-label">Question 3 — Active / Passive (CRS standard)</div>
+                <div class="node-text">"Is more than 50% of your income from passive sources (dividends, interest, rents, royalties)?"</div>
+                <div class="node-detail">OECD CRS definition. Income from actively managed businesses = active income.</div>
+              </div>
+
+              <div class="branch-connector">
+                <div class="branch-arm left"></div>
+                <div class="branch-arm right"></div>
+              </div>
+
+              <div class="branch">
+                <div class="branch-path">
+                  <div class="connector"><div class="connector-label no">No (&lt;50% passive)</div><div class="connector-line"></div></div>
+                  <div class="node outcome-approve">
+                    <div class="node-label">Onboard &#x2705;</div>
+                    <div class="node-text">Active NFE</div>
+                    <div class="node-detail">Commercial holding with active subsidiaries. CRS: entity-level data only.</div>
+                  </div>
+                </div>
+                <div class="branch-path">
+                  <div class="connector"><div class="connector-label yes">Yes (&ge;50% passive)</div><div class="connector-line"></div></div>
+                  <div class="node outcome-approve">
+                    <div class="node-label">Onboard &#x2705; + Flag</div>
+                    <div class="node-text">Passive NFE</div>
+                    <div class="node-detail">Onboarded but flagged as Passive NFE (back-office only). Flag is updateable.</div>
+                  </div>
+                  <div class="connector"><div class="connector-line"></div></div>
+                  <div class="node data-collect">
+                    <div class="node-label">Additional CRS Data Required</div>
+                    <div class="node-text">Collect for each UBO:</div>
+                    <div class="node-detail">Tax residence(s) &middot; TIN(s) &middot; Place of birth &middot; Nature of control</div>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            <div class="branch-path">
+              <div class="connector"><div class="connector-label no">No</div><div class="connector-line"></div></div>
+
+              <div class="node question">
+                <div class="node-label">Question 2b — Future Plans</div>
+                <div class="node-text">"Do you plan to acquire ownership in other companies?"</div>
+                <div class="node-detail">For holdings in early stage that don't yet own subsidiaries</div>
+              </div>
+
+              <div class="branch-connector">
+                <div class="branch-arm left"></div>
+                <div class="branch-arm right"></div>
+              </div>
+
+              <div class="branch">
+                <div class="branch-path">
+                  <div class="connector"><div class="connector-label yes">Yes</div><div class="connector-line"></div></div>
+                  <div class="node outcome-approve">
+                    <div class="node-label">Onboard &#x2705; + Flag</div>
+                    <div class="node-text">Passive NFE</div>
+                    <div class="node-detail">Flagged as Passive NFE. Plans to acquire but no subsidiaries yet.</div>
+                  </div>
+                  <div class="connector"><div class="connector-line"></div></div>
+                  <div class="node data-collect">
+                    <div class="node-label">Additional CRS Data Required</div>
+                    <div class="node-text">Collect UBO data</div>
+                    <div class="node-detail">Tax residence(s) &middot; TIN(s) &middot; Place of birth &middot; Nature of control</div>
+                  </div>
+                </div>
+                <div class="branch-path">
+                  <div class="connector"><div class="connector-label no">No</div><div class="connector-line"></div></div>
+                  <div class="node outcome-reject">
+                    <div class="node-label">Reject</div>
+                    <div class="node-text">No substance, no plans</div>
+                    <div class="node-detail">"We currently serve companies with active business operations or acquisition plans."</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout" style="margin-top: 40px;">
+        <div class="callout-title">Separate workstream: CRS data for ALL companies</div>
+        <div class="callout-text">
+          Independent of the holding flow above, we add <strong>optional</strong> CRS fields to the onboarding of <strong>every</strong> legal entity:<br><br>
+          &bull; Jurisdiction(s) of tax residence (multiple allowed)<br>
+          &bull; TIN(s) per jurisdiction<br><br>
+          This prepares for mandatory CRS reporting to the Luxembourg tax authority (ACD).
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- TAB 2: CRS -->
+  <section class="section" id="crs">
+    <div class="section-title">CRS Data Collection Requirements</div>
+    <div class="section-desc">What new data we need to collect and for whom. All fields optional during initial rollout, new clients only.<br>Source: <a href="https://impotsdirects.public.lu/content/dam/acd/fr/legislation/legi17/ECHA4.pdf" target="_blank">CRS Luxembourg Circular ECHA-4</a>, <a href="https://www.e-file.lu/wiki/CRS_Manual" target="_blank">CRS Manual (e-file.lu)</a>, ACT-231</div>
+
+    <h3 style="font-size:15px; font-weight:700; margin-bottom:12px;">Summary: What's New</h3>
+    <table class="crs-table">
+      <thead>
+        <tr><th>Who</th><th>New Fields</th><th>When Required</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Every Legal Entity</strong></td>
+          <td>Tax residence(s), TIN(s), Entity classification</td>
+          <td>Always at onboarding</td>
+        </tr>
+        <tr>
+          <td><strong>Every Retail client</strong></td>
+          <td>Tax residence(s), TIN(s), Place of birth</td>
+          <td>Always at onboarding</td>
+        </tr>
+        <tr>
+          <td><strong>Each UBO of Passive NFE</strong></td>
+          <td>Tax residence(s), TIN(s), Place of birth, Nature of control</td>
+          <td>Only when entity = Passive NFE</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:15px; font-weight:700; margin: 32px 0 12px;">Legal Entity (SME Account Holder)</h3>
+    <table class="crs-table">
+      <thead>
+        <tr><th>Field</th><th>Status</th><th>CRS Requirement</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Legal name</td><td><span class="badge existing">Collected</span></td><td>Mandatory</td></tr>
+        <tr><td>Registered address</td><td><span class="badge existing">Collected</span></td><td>Mandatory</td></tr>
+        <tr><td>Jurisdiction(s) of tax residence</td><td><span class="badge new">New</span></td><td>Mandatory. Multiple allowed</td></tr>
+        <tr><td>TIN(s) per jurisdiction</td><td><span class="badge new">New</span></td><td>Mandatory</td></tr>
+        <tr><td>Entity classification (FI / Active NFE / Passive NFE)</td><td><span class="badge new">New</span></td><td>Mandatory. Drives controlling person reporting</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:15px; font-weight:700; margin: 32px 0 12px;">Controlling Persons (UBOs) — Only If Passive NFE</h3>
+    <table class="crs-table">
+      <thead>
+        <tr><th>Field</th><th>Status</th><th>CRS Requirement</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Full name</td><td><span class="badge existing">Collected</span></td><td>Mandatory</td></tr>
+        <tr><td>Residential address</td><td><span class="badge conditional">Partial</span></td><td>Mandatory — verify completeness</td></tr>
+        <tr><td>Jurisdiction(s) of tax residence</td><td><span class="badge new">New</span></td><td>Mandatory. Multiple per person</td></tr>
+        <tr><td>TIN(s) per jurisdiction</td><td><span class="badge new">New</span></td><td>Mandatory</td></tr>
+        <tr><td>Date of birth</td><td><span class="badge existing">Collected</span></td><td>Mandatory</td></tr>
+        <tr><td>Place of birth</td><td><span class="badge new">New</span></td><td>Mandatory (Luxembourg requirement)</td></tr>
+        <tr><td>Nature of control</td><td><span class="badge new">New</span></td><td>"Ownership" vs "control by other means"</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:15px; font-weight:700; margin: 32px 0 12px;">Applicant / Directors</h3>
+    <table class="crs-table">
+      <thead>
+        <tr><th>Role</th><th>CRS Data Needed?</th><th>Reason</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Applicant</td><td>No (unless also UBO of Passive NFE)</td><td>Not a CRS reporting concept</td></tr>
+        <tr><td>Director</td><td>No (unless also UBO of Passive NFE)</td><td>Not a CRS reporting concept</td></tr>
+        <tr><td>Shareholder / Member</td><td>No (unless also UBO of Passive NFE)</td><td>Not a CRS reporting concept</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:15px; font-weight:700; margin: 32px 0 12px;">Individual / Retail Account Holder</h3>
+    <table class="crs-table">
+      <thead>
+        <tr><th>Field</th><th>Status</th><th>CRS Requirement</th></tr>
+      </thead>
+      <tbody>
+        <tr><td>Full name</td><td><span class="badge existing">Collected</span></td><td>Mandatory</td></tr>
+        <tr><td>Residential address</td><td><span class="badge existing">Collected</span></td><td>Mandatory</td></tr>
+        <tr><td>Jurisdiction(s) of tax residence</td><td><span class="badge new">New</span></td><td>Mandatory. Multiple allowed</td></tr>
+        <tr><td>TIN per jurisdiction</td><td><span class="badge new">New</span></td><td>Mandatory</td></tr>
+        <tr><td>Date of birth</td><td><span class="badge existing">Collected</span></td><td>Mandatory</td></tr>
+        <tr><td>Place of birth</td><td><span class="badge new">New</span></td><td>Mandatory (Luxembourg requirement)</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="font-size:15px; font-weight:700; margin: 32px 0 12px;">CRS Entity Classification Definitions</h3>
+    <table class="crs-table">
+      <thead>
+        <tr><th>Classification</th><th>Definition</th><th>Examples</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Financial Institution (FI)</strong></td>
+          <td>Bank, investment fund, insurance company, custodial institution</td>
+          <td>Currently out of VMSA risk appetite</td>
+        </tr>
+        <tr>
+          <td><strong>Active NFE</strong></td>
+          <td>&ge;50% of gross income from active sources (sales, services) OR &ge;50% of assets used in active business</td>
+          <td>Trading companies, SaaS, retailers, holdings managing active subsidiaries</td>
+        </tr>
+        <tr>
+          <td><strong>Passive NFE</strong></td>
+          <td>Does not qualify as Active and is not an FI. Income mainly from dividends, interest, royalties, rental income</td>
+          <td>Dormant holdings, IP entities, SPVs, family offices</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="callout" style="margin-top: 24px; border-left-color: var(--green);">
+      <div class="callout-title" style="color: var(--green);">Key nuance</div>
+      <div class="callout-text">Income from actively managed operating businesses = <strong>active income</strong>. Shareholdings in active subsidiaries = <strong>active assets</strong> (not passive).</div>
+    </div>
+  </section>
+
+  <!-- TAB 3: DECISIONS -->
+  <section class="section" id="decisions">
+    <div class="section-title">Key Design Decisions</div>
+    <div class="section-desc">Rationale behind each design choice in the proposed flow.</div>
+
+    <div class="decisions">
+      <div class="decision-card">
+        <h4>NACE code as trigger, not sole decider</h4>
+        <p>NACE codes can be wrong &mdash; set at company registration and rarely updated. A consulting firm might have a holding NACE code, or a real holding might be registered as "management consultancy." We use NACE 6420/7010 to trigger the question, but the client confirms whether they are actually a holding.</p>
+      </div>
+      <div class="decision-card">
+        <h4>Inline questions replace async inquiry</h4>
+        <p><strong>Current:</strong> application &rarr; acceptance request &rarr; CORPORATE_STRUCTURE inquiry &rarr; client replies by email &rarr; agent review &rarr; decision.<br>
+        <strong>Proposed:</strong> questions answered in onboarding flow &rarr; immediate automated decision. This eliminates the compliance ops bottleneck for holdings entirely.</p>
+      </div>
+      <div class="decision-card">
+        <h4>Subsidiary capture via CreditSafe search</h4>
+        <p>Client searches companies by name in a search box (powered by CreditSafe API), selects them, and enters ownership %. This data is stored internally and populates the entity graph with Company &rarr; OWNS &rarr; Company edges with ownership percentages and source tracking.</p>
+      </div>
+      <div class="decision-card">
+        <h4>Passive NFE = onboard + flag (policy change)</h4>
+        <p><strong>Previously:</strong> passive holdings were rejected.<br><strong>Now:</strong> passive NFEs can be onboarded but must be flagged internally. The Passive NFE flag is back-office only (not visible to client) and must be updateable if classification changes over time (e.g., company acquires active subsidiaries).</p>
+      </div>
+      <div class="decision-card">
+        <h4>Active/Passive test = CRS standard (OECD)</h4>
+        <p>Uses the OECD CRS definition: &ge;50% income from active sources OR &ge;50% assets in active business = Active NFE. This is an international regulatory standard, not an internal invention. It directly satisfies CRS reporting obligations while providing the substance test we need.</p>
+      </div>
+      <div class="decision-card">
+        <h4>"Plans to own" branch</h4>
+        <p>A company with a holding NACE code that confirms it's a holding but doesn't currently own subsidiaries &mdash; if they plan to acquire, we onboard them as Passive NFE. This prevents rejecting companies in early formation stages that intend to build a corporate group.</p>
+      </div>
+      <div class="decision-card">
+        <h4>CRS data: optional now, mandatory later</h4>
+        <p>All new CRS fields (tax residence, TIN, place of birth, entity classification) are added as optional during initial rollout. This prepares the system for when CRS reporting becomes mandatory without blocking current onboarding. Applies to new clients only.</p>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div class="footer">
+  Vivid Money &middot; Holding Company Onboarding Proposal &middot; February 2026 &middot; For internal compliance review
+</div>
+
+<script>
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.tab).classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>
