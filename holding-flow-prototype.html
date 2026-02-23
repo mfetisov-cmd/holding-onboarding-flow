@@ -719,6 +719,9 @@
     <div class="field-question">What's your company average annual turnover?</div>
     <div class="field"><select class="field-select" id="turnoverSelect"><option>Less than 20,000 €</option><option>20,000 – 100,000 €</option><option>100,000 – 500,000 €</option><option>More than 500,000 €</option></select><label class="field-label">Average monthly revenue</label></div>
 
+    <div class="field-question">What's your business about? Add details about the goods and services you offer and your main source of revenue</div>
+    <div class="field"><textarea class="field-textarea" placeholder="Add a description">Unternehmensberatung und Halten von Beteiligungen an operativen Gesellschaften</textarea></div>
+
     <div class="field-question">What type of business is this?</div>
     <div class="field">
       <select class="field-select" id="entityTypeSelect" onchange="handleEntityType(this.value)">
@@ -732,77 +735,49 @@
 
     <!-- HOLDING REVEAL -->
     <div class="reveal open" id="holdingSection">
-      <div class="crs-group" style="background: white; border-color: var(--border);">
-        <div class="section-header" style="margin-bottom: 10px;">
-          <span class="section-title" style="color: var(--text);">Holding company details</span>
-        </div>
+      <div class="field-question">Do you currently own or control other companies?</div>
+      <div class="field">
+        <select class="field-select" id="ownsSelect" onchange="handleOwns(this.value)">
+          <option value="">Select...</option>
+          <option value="yes">Yes, we own other companies</option>
+          <option value="plans">Not yet, but we plan to acquire</option>
+          <option value="no">No, and no plans to</option>
+        </select>
+        <label class="field-label">Ownership status</label>
+      </div>
 
-        <div class="field-question">Do you currently own or control other companies?</div>
+      <div class="reveal" id="ownsYesReveal"></div>
+
+      <div class="reveal" id="plansReveal">
+        <div class="callout callout-green" style="margin-top: 10px;">
+          <span class="callout-icon">✓</span>
+          <span class="callout-text">You can open an account while planning your acquisitions. We'll classify your entity as a Passive NFE for reporting purposes.</span>
+        </div>
+      </div>
+
+      <div class="reveal" id="rejectReveal">
+        <div class="outcome reject visible" style="margin-top: 10px;">
+          <h3>Unable to proceed</h3>
+          <p>We currently serve companies with active business operations or plans to acquire other businesses.</p>
+        </div>
+      </div>
+
+      <div class="reveal" id="incomeReveal">
+        <hr class="divider" style="margin: 16px 0 12px;">
+        <div class="field-question">How does your company primarily generate income?</div>
         <div class="field">
-          <select class="field-select" id="ownsSelect" onchange="handleOwns(this.value)">
+          <select class="field-select" id="incomeSelect" onchange="handleIncome(this.value)">
             <option value="">Select...</option>
-            <option value="yes">Yes, we own other companies</option>
-            <option value="plans">Not yet, but we plan to acquire</option>
-            <option value="no">No, and no plans to</option>
+            <option value="active">Management fees, services, revenue through subsidiaries</option>
+            <option value="passive">Mainly dividends, interest, rents, royalties</option>
           </select>
-          <label class="field-label">Ownership status</label>
+          <label class="field-label">Primary income source</label>
         </div>
 
-        <div class="reveal" id="ownsYesReveal">
-          <div class="callout callout-purple" style="margin-top: 10px;">
-            <span class="callout-icon">💡</span>
-            <span class="callout-text">You'll add your subsidiaries on the next screen using company search.</span>
-          </div>
-        </div>
-
-        <div class="reveal" id="plansReveal">
-          <div class="callout callout-green" style="margin-top: 10px;">
-            <span class="callout-icon">✓</span>
-            <span class="callout-text">You can open an account while planning your acquisitions. We'll classify your entity as a Passive NFE for reporting purposes.</span>
-          </div>
-        </div>
-
-        <div class="reveal" id="rejectReveal">
-          <div class="outcome reject visible" style="margin-top: 10px;">
-            <h3>Unable to proceed</h3>
-            <p>We currently serve companies with active business operations or plans to acquire other businesses.</p>
-          </div>
-        </div>
-
-        <div class="reveal" id="incomeReveal">
-          <hr class="divider" style="margin: 16px 0 12px;">
-          <div class="field-question">How does your company primarily generate income?</div>
-          <div class="field">
-            <select class="field-select" id="incomeSelect" onchange="handleIncome(this.value)">
-              <option value="">Select...</option>
-              <option value="active">Active — management fees, services, revenue through subsidiaries</option>
-              <option value="passive">Passive — mainly dividends, interest, rents, royalties</option>
-            </select>
-            <label class="field-label">Primary income source</label>
-          </div>
-
-          <div class="reveal" id="activeResult">
-            <div class="outcome approve visible" style="margin-top: 8px;">
-              <h3>Active NFE ✓</h3>
-              <p>Your company qualifies as an Active Non-Financial Entity. Standard onboarding applies.</p>
-            </div>
-          </div>
-
-          <div class="reveal" id="passiveResult">
-            <div class="outcome approve visible" style="margin-top: 8px;">
-              <h3>Passive NFE — additional data required</h3>
-              <p>Your company is classified as a Passive NFE. We'll need tax reporting data for each beneficial owner on the next steps.</p>
-            </div>
-          </div>
-        </div>
-
+        <div class="reveal" id="activeResult"></div>
+        <div class="reveal" id="passiveResult"></div>
       </div>
     </div>
-
-    <hr class="divider">
-
-    <div class="field-question">What's your business about? Add details about the goods and services you offer and your main source of revenue</div>
-    <div class="field"><textarea class="field-textarea" placeholder="Add a description">Unternehmensberatung und Halten von Beteiligungen an operativen Gesellschaften</textarea></div>
 
     <div class="check-row">
       <div class="check-box on"><span class="tick">✓</span></div>
