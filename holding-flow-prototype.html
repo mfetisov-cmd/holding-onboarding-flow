@@ -635,7 +635,7 @@
   <button class="demo-btn" onclick="setScenario('passive')">Passive Holding</button>
   <button class="demo-btn" onclick="setScenario('plans')">Plans to Acquire</button>
   <button class="demo-btn" onclick="setScenario('notholding')">Not a Holding</button>
-  <button class="demo-btn" onclick="setScenario('reject')">Rejection</button>
+  <button class="demo-btn" onclick="setScenario('under25')">Holding &lt;25%</button>
   <div class="demo-step-btns">
     <button class="demo-step active" onclick="goTo(1)">1</button>
     <button class="demo-step" onclick="goTo(2)">2</button>
@@ -683,6 +683,13 @@
     </div>
 
     <div class="add-link">+ Add another tax residence</div>
+
+    <hr class="divider">
+
+    <div class="check-row" onclick="this.querySelector('.check-box').classList.toggle('on');this.querySelector('.check-box').classList.toggle('off');this.querySelector('.tick').textContent=this.querySelector('.check-box').classList.contains('on')?'✓':''">
+      <div class="check-box on"><span class="tick">✓</span></div>
+      <span class="check-label">I confirm that the company is not a U.S. person and is not subject to FATCA reporting obligations</span>
+    </div>
   </div>
   <div class="bottom-bar">
     <button class="back-btn">←</button>
@@ -714,11 +721,18 @@
     <div class="field-question">Select the primary country of business activity</div>
     <div class="field"><div class="field-with-flag"><span class="field-flag">🇩🇪</span><select class="field-select"><option>Germany</option></select><label class="field-label">Country</label></div></div>
 
-    <div class="field-question">What's your company average annual turnover?</div>
-    <div class="field"><select class="field-select" id="turnoverSelect"><option>Less than 20,000 €</option><option>20,000 – 100,000 €</option><option>100,000 – 500,000 €</option><option>More than 500,000 €</option></select><label class="field-label">Average monthly revenue</label></div>
+    <div class="field"><select class="field-select" id="turnoverSelect"><option>Up to €50,000/month (€600K/year)</option><option>Up to €10,000/month (€120K/year)</option><option>Up to €100,000/month (€1.2M/year)</option><option>More than €100,000/month</option></select><label class="field-label">Expected turnover</label></div>
 
-    <div class="field-question">What's your business about? Add details about the goods and services you offer and your main source of revenue</div>
-    <div class="field"><textarea class="field-textarea" placeholder="Add a description">Unternehmensberatung und Halten von Beteiligungen an operativen Gesellschaften</textarea></div>
+    <div class="field"><input class="field-input" placeholder="Describe your business and revenue sources"><label class="field-label">Business description</label></div>
+
+    <div class="field"><input class="field-input" placeholder="Brand name used for payments (optional)"><label class="field-label">Brand name (optional)</label></div>
+
+    <div class="check-row" onclick="this.querySelector('.check-box').classList.toggle('on');this.querySelector('.check-box').classList.toggle('off');this.querySelector('.tick').textContent=this.querySelector('.check-box').classList.contains('on')?'✓':''">
+      <div class="check-box off"><span class="tick"></span></div>
+      <span class="check-label">I plan to make occasional cash withdrawals</span>
+    </div>
+
+    <hr class="divider">
 
     <div class="field-question">Is your company a holding company?</div>
     <div class="field">
@@ -732,15 +746,15 @@
 
     <!-- HOLDING REVEAL -->
     <div class="reveal open" id="holdingSection">
-      <div class="field-question">Do you currently own or control other companies?</div>
+      <div class="field-question">Do you hold 25% or more ownership in any companies?</div>
       <div class="field">
         <select class="field-select" id="ownsSelect" onchange="handleOwns(this.value)">
           <option value="">Select...</option>
-          <option value="yes">Yes, we own other companies</option>
+          <option value="yes">Yes, 25% or more</option>
           <option value="plans">Not yet, but we plan to acquire</option>
-          <option value="no">No, and no plans to</option>
+          <option value="no">No, less than 25%</option>
         </select>
-        <label class="field-label">Ownership status</label>
+        <label class="field-label">Ownership stake</label>
       </div>
 
       <div class="reveal" id="ownsYesReveal"></div>
@@ -775,12 +789,6 @@
         <div class="reveal" id="passiveResult"></div>
       </div>
     </div>
-
-    <div class="check-row">
-      <div class="check-box on"><span class="tick">✓</span></div>
-      <span class="check-label">I want to withdraw cash from my account</span>
-    </div>
-    <div class="field"><input class="field-input" value="0"><label class="field-label">Expected monthly cash withdrawals (€)</label></div>
   </div>
   <div class="bottom-bar">
     <button class="back-btn" onclick="goTo(1)">←</button>
@@ -895,18 +903,13 @@
       </div>
 
       <div class="add-link">+ Add another tax residence</div>
+    </div>
 
-      <hr class="divider" style="margin: 10px 0;">
+    <hr class="divider">
 
-      <div class="field"><input class="field-input" value="Berlin"><label class="field-label">Place of birth</label></div>
-
-      <div class="field">
-        <select class="field-select">
-          <option>Ownership (direct shareholding)</option>
-          <option>Control by other means</option>
-        </select>
-        <label class="field-label">Nature of control</label>
-      </div>
+    <div class="check-row" onclick="this.querySelector('.check-box').classList.toggle('on');this.querySelector('.check-box').classList.toggle('off');this.querySelector('.tick').textContent=this.querySelector('.check-box').classList.contains('on')?'✓':''">
+      <div class="check-box on"><span class="tick">✓</span></div>
+      <span class="check-label">I confirm that this person is not a U.S. person and is not subject to FATCA reporting obligations</span>
     </div>
 
     <div class="btn-pair">
@@ -974,8 +977,9 @@ function handleOwns(val) {
     document.getElementById('screen2Btn').disabled = false;
     document.getElementById('incomeSelect').value = 'passive';
   } else if (val === 'no') {
-    open('rejectReveal');
-    document.getElementById('screen2Btn').disabled = true;
+    open('incomeReveal');
+    document.getElementById('screen2BtnText').textContent = 'Next: Owners and Decision Makers';
+    document.getElementById('screen2Btn').disabled = false;
   } else {
     document.getElementById('screen2Btn').disabled = false;
   }
@@ -1073,9 +1077,10 @@ function setScenario(type) {
     et.value = 'regular'; handleEntityType('regular');
     owns.value = ''; income.value = '';
     document.getElementById('screen2BtnText').textContent = 'Next: Owners and Decision Makers';
-  } else if (type === 'reject') {
+  } else if (type === 'under25') {
     et.value = 'holding'; handleEntityType('holding');
     owns.value = 'no'; handleOwns('no');
+    income.value = 'passive'; handleIncome('passive');
   }
 
   goTo(1);
