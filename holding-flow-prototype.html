@@ -746,15 +746,15 @@
 
     <!-- HOLDING REVEAL -->
     <div class="reveal open" id="holdingSection">
-      <div class="field-question">Do you hold 25% or more ownership in any companies?</div>
+      <div class="field-question">Do you currently own or control other companies?</div>
       <div class="field">
         <select class="field-select" id="ownsSelect" onchange="handleOwns(this.value)">
           <option value="">Select...</option>
-          <option value="yes">Yes, 25% or more</option>
+          <option value="yes">Yes</option>
           <option value="plans">Not yet, but we plan to acquire</option>
-          <option value="no">No, less than 25%</option>
+          <option value="no">No</option>
         </select>
-        <label class="field-label">Ownership stake</label>
+        <label class="field-label">Ownership status</label>
       </div>
 
       <div class="reveal" id="ownsYesReveal"></div>
