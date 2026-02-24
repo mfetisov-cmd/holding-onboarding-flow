@@ -633,6 +633,7 @@
   <span class="demo-bar-label">Scenario:</span>
   <button class="demo-btn active" onclick="setScenario('active')">Active Holding</button>
   <button class="demo-btn" onclick="setScenario('passive')">Passive Holding</button>
+  <button class="demo-btn" onclick="setScenario('personal')">Personal Holding</button>
   <button class="demo-btn" onclick="setScenario('notholding')">Not a Holding</button>
   <div class="demo-step-btns">
     <button class="demo-step active" onclick="goTo(1)">1</button>
@@ -744,14 +745,33 @@
 
     <!-- HOLDING REVEAL -->
     <div class="reveal open" id="holdingSection">
-      <div class="field-question">How does your company primarily generate income?</div>
+      <div class="field-question">What is the primary purpose of your holding company?</div>
       <div class="field">
-        <select class="field-select" id="incomeSelect" onchange="handleIncome(this.value)">
+        <select class="field-select" id="purposeSelect" onchange="handlePurpose(this.value)">
           <option value="">Select...</option>
-          <option value="active">More than 50% from management fees, services, or revenue through subsidiaries</option>
-          <option value="passive">More than 50% from dividends, interest, rents, or royalties</option>
+          <option value="commercial" selected>Managing a group of operating businesses</option>
+          <option value="personal">Managing personal or family assets and investments</option>
         </select>
-        <label class="field-label">Primary income source</label>
+        <label class="field-label">Holding purpose</label>
+      </div>
+
+      <div class="reveal" id="personalReject">
+        <div class="outcome reject visible" style="margin-top: 10px;">
+          <h3>Unable to proceed</h3>
+          <p>Due to regulatory requirements, personal asset-holding companies cannot be onboarded through Vivid Money. Please contact support if you believe this doesn't apply to your case.</p>
+        </div>
+      </div>
+
+      <div class="reveal open" id="incomeSection">
+        <div class="field-question">How does your company primarily generate income?</div>
+        <div class="field">
+          <select class="field-select" id="incomeSelect" onchange="handleIncome(this.value)">
+            <option value="">Select...</option>
+            <option value="active">More than 50% from management fees, services, or revenue through subsidiaries</option>
+            <option value="passive">More than 50% from dividends, interest, rents, or royalties</option>
+          </select>
+          <label class="field-label">Primary income source</label>
+        </div>
       </div>
     </div>
   </div>
@@ -922,10 +942,29 @@ function handleEntityType(val) {
   const section = document.getElementById('holdingSection');
   if (val === 'holding') {
     section.classList.add('open');
-    document.getElementById('screen2BtnText').textContent = 'Next: Add Subsidiaries';
+    handlePurpose(document.getElementById('purposeSelect').value);
   } else {
     section.classList.remove('open');
     document.getElementById('screen2BtnText').textContent = 'Next: Owners and Decision Makers';
+    document.getElementById('screen2Btn').disabled = false;
+  }
+}
+
+function handlePurpose(val) {
+  const reject = document.getElementById('personalReject');
+  const income = document.getElementById('incomeSection');
+  reject.classList.remove('open');
+  income.classList.remove('open');
+
+  if (val === 'commercial') {
+    income.classList.add('open');
+    document.getElementById('screen2BtnText').textContent = 'Next: Add Subsidiaries';
+    document.getElementById('screen2Btn').disabled = false;
+  } else if (val === 'personal') {
+    reject.classList.add('open');
+    document.getElementById('screen2Btn').disabled = true;
+  } else {
+    document.getElementById('screen2Btn').disabled = false;
   }
 }
 
@@ -988,17 +1027,24 @@ function setScenario(type) {
   renderSubs();
 
   const et = document.getElementById('entityTypeSelect');
+  const purpose = document.getElementById('purposeSelect');
   const income = document.getElementById('incomeSelect');
 
   if (type === 'active') {
     et.value = 'holding'; handleEntityType('holding');
+    purpose.value = 'commercial'; handlePurpose('commercial');
     income.value = 'active';
   } else if (type === 'passive') {
     et.value = 'holding'; handleEntityType('holding');
+    purpose.value = 'commercial'; handlePurpose('commercial');
     income.value = 'passive';
+  } else if (type === 'personal') {
+    et.value = 'holding'; handleEntityType('holding');
+    purpose.value = 'personal'; handlePurpose('personal');
+    income.value = '';
   } else if (type === 'notholding') {
     et.value = 'regular'; handleEntityType('regular');
-    income.value = '';
+    purpose.value = ''; income.value = '';
   }
   goTo(1);
 }
